@@ -26,9 +26,10 @@ function CollectionPage({ collections, setCollections }) {
         setCollections(collections.map(collection => (
             collection.id === Number(id)
             ? {...collection, mods: [...collection.mods, mod]}
-            : collection
-        ))
+            : collection)
+            )
         )
+        setInputValue("");
     }
 
     function removeMod(modId) {
@@ -38,8 +39,20 @@ function CollectionPage({ collections, setCollections }) {
                         mods: collection.mods.filter(mod => mod.id !== modId)}
                     : collection
                 ))
-            )
+            );
         }
+    
+    function saveMod(modId, newText) {
+        setCollections(
+            collections.map(collection => (
+                collection.id === Number(id) 
+                ? {...collection, 
+                    mods: collection.mods.map(mod => 
+                        modId === mod.id ? {...mod, title: newText} : mod)}
+                : collection
+            ))
+        );
+    }
     
     return (
         <div>
@@ -53,7 +66,8 @@ function CollectionPage({ collections, setCollections }) {
                 {currentCollection.mods.map(mod => (
                     <Mod key={mod.id}
                     mod={mod}
-                    removeMod={removeMod}/>
+                    removeMod={removeMod}
+                    saveMod={saveMod}/>
                 ))}
             </ul>
         </div>
