@@ -6,7 +6,8 @@ function Mod({ mod, removeMod, saveMod }) {
     return (
         <div>
             <li>
-                {isEditing ? (
+                {isEditing 
+                    ? (
                     <>
                     <input value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}/>
@@ -15,13 +16,21 @@ function Mod({ mod, removeMod, saveMod }) {
                         setIsEditing(false);
                     }}>Сохранить</button>
                     </>
-                ) : (
+                    ) 
+
+                    : (
                     <>
-                    <span>{mod.title}</span>
+                    <img src={mod.image} alt="mod image"/> 
+                    <h3>{mod.title}</h3>
+                    <p>{mod.description}</p>
+                    <a href={mod.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Ссылка на мод</a>
                     <button onClick={() => setIsEditing(true)}>Редактировать</button>
                     <button onClick={() => removeMod(mod.id)}>Удалить мод</button>
                     </>
-                )} 
+                    )} 
             </li>
         </div>
     )

@@ -4,7 +4,12 @@ import Mod from "../components/Mod";
 
 function CollectionPage({ collections, setCollections }) {
     const { id } = useParams();
-    const [inputValue, setInputValue] = useState("");
+    const [form, setForm] = useState({
+        title: "",
+        description: "",
+        link: "",
+        image: ""
+    });
     const currentCollection = collections.find(collection => collection.id === Number(id));
     if (!currentCollection) {
         return (
@@ -14,13 +19,21 @@ function CollectionPage({ collections, setCollections }) {
         )
     }
 
+    function handleChange(e) {
+        setForm({...form, 
+            [e.target.name]: e.target.value})
+    }
+
     function addMod(id) {
-        const value = inputValue.trim();
-        if (!value) return;
+        const hasEmptyField = Object.values(form).some(field => field.trim().length === 0)
+        if (hasEmptyField) return;
 
         const mod = {
-            title: value,
-            id: Date.now()
+            id: Date.now(),
+            title: form.title.trim(),
+            description: form.description.trim(),
+            link: form.link.trim(),
+            image: form.image.trim()
         }
 
         setCollections(collections.map(collection => (
@@ -29,7 +42,12 @@ function CollectionPage({ collections, setCollections }) {
             : collection)
             )
         )
-        setInputValue("");
+        setForm({
+            title: "",
+            description: "",
+            link: "",
+            image: ""
+        });
     }
 
     function removeMod(modId) {
@@ -57,11 +75,34 @@ function CollectionPage({ collections, setCollections }) {
     return (
         <div>
             <h3>{currentCollection.title}</h3>
-            <label htmlFor="mod-input">Введите название мода: </label>
-            <input id="mod-input"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}/>
-            <button onClick={() => addMod(currentCollection.id)}>Добавить мод</button>
+            <form>
+
+                <label htmlFor="mod-input-title">Введите название мода: </label>
+                <input id="mod-input-title"
+                    name="title"
+                    value={form.title}
+                    onChange={handleChange}/>
+
+                <label htmlFor="mod-input-description">Введите описание: </label>
+                <input id="mod-input-description"
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}/>
+
+                <label htmlFor="mod-input-link">Введите ссылку на мод: </label>
+                <input id="mod-input-link"
+                    name="link"
+                    value={form.link}
+                    onChange={handleChange}/>
+
+                <label htmlFor="mod-input-image">Введите ссылку на картинку мода: </label>
+                <input id="mod-input-image"
+                    name="image"
+                    value={form.image}
+                    onChange={handleChange}/>
+
+                <button onClick={() => addMod(currentCollection.id)}>Добавить мод</button>
+            </form>
             <ul>
                 {currentCollection.mods.map(mod => (
                     <Mod key={mod.id}
