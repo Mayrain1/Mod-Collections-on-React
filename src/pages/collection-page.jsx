@@ -19,6 +19,8 @@ function CollectionPage({ collections, setCollections }) {
         )
     }
 
+    const [editValue, setEditValue] = useState("");
+
     function handleChange(e) {
         setForm({...form, 
             [e.target.name]: e.target.value})
@@ -60,22 +62,28 @@ function CollectionPage({ collections, setCollections }) {
             );
         }
     
-    function saveMod(modId, newText) {
+    function saveMod(newEditMod) {
         setCollections(
             collections.map(collection => (
                 collection.id === Number(id) 
                 ? {...collection, 
                     mods: collection.mods.map(mod => 
-                        modId === mod.id ? {...mod, title: newText} : mod)}
+                        newEditMod.id === mod.id ? {
+                            ...newEditMod
+                        } : mod)}
                 : collection
             ))
         );
     }
+
+    const filteredMods = currentCollection.mods.filter(mod => 
+        mod.title.toLowerCase().includes(editValue.toLowerCase())
+    );
     
     return (
         <div>
             <h3>{currentCollection.title}</h3>
-            <form>
+            <form id="mod-form">
 
                 <label htmlFor="mod-input-title">Введите название мода: </label>
                 <input id="mod-input-title"
@@ -103,8 +111,14 @@ function CollectionPage({ collections, setCollections }) {
 
                 <button onClick={() => addMod(currentCollection.id)}>Добавить мод</button>
             </form>
+
+            <label htmlFor="search-input">Поиск по названию мода: </label>
+            <input id="search-input"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}/>
+
             <ul>
-                {currentCollection.mods.map(mod => (
+                {filteredMods.map(mod => (
                     <Mod key={mod.id}
                     mod={mod}
                     removeMod={removeMod}
