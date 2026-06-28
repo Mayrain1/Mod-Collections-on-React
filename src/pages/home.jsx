@@ -40,6 +40,14 @@ function Home({ collections, setCollections }) {
     setCollections(collections.filter(collection => id !== collection.id));
   }
 
+  function saveCollection(newCollection) {
+    setCollections(collections.map(collection => (
+      collection.id === newCollection.id 
+      ? {...collection, title: newCollection.title, description: newCollection.description}
+      : collection
+    )))
+  }
+
   const filteredCollections = collections.filter(col => 
     col.title.toLowerCase().includes(searchValue.toLowerCase())
   );
@@ -58,7 +66,7 @@ function Home({ collections, setCollections }) {
           value={collectionForm.title}
           onChange={handleChange}/>
 
-           <label htmlFor="collection-title">Введите описание коллекции: </label>
+           <label htmlFor="collection-description">Введите описание коллекции: </label>
           <input id="collection-description"
           name="description"
           value={collectionForm.description}
@@ -72,6 +80,7 @@ function Home({ collections, setCollections }) {
           key={collection.id}
           collection={collection}
           removeCollection={removeCollection}
+          saveCollection={saveCollection}
           />
         ))}
       </ul>
