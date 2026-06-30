@@ -6,13 +6,22 @@ function Collection({collection, removeCollection, saveCollection}) {
     const [editForm, setEditForm] = useState(null);
 
     function handleChange(e) {
-        setEditForm({...editForm, [e.target.name]: e.target.value})
+        setEditForm(prev => ({...prev, [e.target.name]: e.target.value}))
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        saveCollection({...editForm, 
+                        title: editForm.title.trim(), 
+                        description: editForm.description.trim()
+                    });
+        setIsEditing(false);
     }
 
     return (
         <li>
             {isEditing ? (<>
-                <form>
+                <form onSubmit={handleSubmit}>
                     <label htmlFor="collection-title">Введите название коллекции: </label>
                     <input id="collection-title"
                     name="title"
@@ -24,11 +33,9 @@ function Collection({collection, removeCollection, saveCollection}) {
                     name="description"
                     value={editForm.description}
                     onChange={handleChange}/>
-                    <button onClick={(e) => {
-                        saveCollection(editForm);
-                        setIsEditing(false);
-                    }}>Сохранить коллекцию</button>
-                    <button onClick={() => setIsEditing(false)}>Отмена</button>
+                    <button type="submit">Сохранить коллекцию</button>
+                    <button  type="button"
+                    onClick={() => setIsEditing(false)}>Отмена</button>
                 </form>
             </>)
             : (

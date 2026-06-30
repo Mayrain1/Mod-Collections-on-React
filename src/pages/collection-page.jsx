@@ -19,16 +19,41 @@ function CollectionPage({ collections, setCollections }) {
         )
     }
 
-    const [editValue, setEditValue] = useState("");
+    const [error, setError] = useState("");
+    const [searchValue, setSearchValue] = useState("");
 
-    function handleChange(e) {
-        setForm({...form, 
-            [e.target.name]: e.target.value})
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        }
+        catch {
+            return false;
+        }
     }
 
-    function addMod(id) {
+    function handleChange(e) {
+        setForm(prev => ({...prev, 
+            [e.target.name]: e.target.value}))
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        addMod();
+    }
+
+    function addMod() {
         const hasEmptyField = Object.values(form).some(field => field.trim().length === 0)
-        if (hasEmptyField) return;
+        if (hasEmptyField) {
+            setError("Введите все значения формы")
+            return;
+        }
+
+        const hasInvalidUrl = [form.link, form.image].some(field => !isValidUrl(field.trim()));
+        if (hasInvalidUrl) {
+            setError("Введите корректное значение ссылки, например: https://example.com")
+            return;
+        }
 
         const mod = {
             id: Date.now(),
@@ -38,12 +63,13 @@ function CollectionPage({ collections, setCollections }) {
             image: form.image.trim()
         }
 
-        setCollections(collections.map(collection => (
+        setCollections(prev => prev.map(collection => (
             collection.id === Number(id)
             ? {...collection, mods: [...collection.mods, mod]}
             : collection)
             )
         )
+        
         setForm({
             title: "",
             description: "",
@@ -53,8 +79,8 @@ function CollectionPage({ collections, setCollections }) {
     }
 
     function removeMod(modId) {
-            setCollections(
-                collections.map(collection => (
+            setCollections(prev =>
+                prev.map(collection => (
                     collection.id === Number(id) ? {...collection, 
                         mods: collection.mods.filter(mod => mod.id !== modId)}
                     : collection
@@ -63,8 +89,8 @@ function CollectionPage({ collections, setCollections }) {
         }
     
     function saveMod(newEditMod) {
-        setCollections(
-            collections.map(collection => (
+        setCollections(prev => 
+            prev.map(collection => (
                 collection.id === Number(id) 
                 ? {...collection, 
                     mods: collection.mods.map(mod => 
@@ -77,13 +103,14 @@ function CollectionPage({ collections, setCollections }) {
     }
 
     const filteredMods = currentCollection.mods.filter(mod => 
-        mod.title.toLowerCase().includes(editValue.toLowerCase())
+        mod.title.toLowerCase().includes(searchValue.trim().toLowerCase())
     );
     
     return (
         <div>
             <h3>{currentCollection.title}</h3>
-            <form id="mod-form">
+            <form id="mod-form" 
+            onSubmit={handleSubmit}>
 
                 <label htmlFor="mod-input-title">Введите название мода: </label>
                 <input id="mod-input-title"
@@ -109,13 +136,15 @@ function CollectionPage({ collections, setCollections }) {
                     value={form.image}
                     onChange={handleChange}/>
 
-                <button onClick={() => addMod(currentCollection.id)}>Добавить мод</button>
+                {error && <p className="erroe">{error}</p>}
+
+                <button type="submit">Добавить мод</button>
             </form>
 
             <label htmlFor="search-input">Поиск по названию мода: </label>
             <input id="search-input"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}/>
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}/>
 
             <ul>
                 {filteredMods.map(mod => (

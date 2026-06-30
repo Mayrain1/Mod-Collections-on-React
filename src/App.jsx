@@ -5,11 +5,17 @@ import CollectionPage from "./pages/collection-page";
 
 function App() {
   const [collections, setCollections] = useState(() => {
-    const saved = localStorage.getItem("collections");
-    if (saved) {
-      return JSON.parse(saved);
+    try {
+        const saved = localStorage.getItem("collections");
+        if (saved) {
+          return JSON.parse(saved);
+        }
+        return [];
     }
-    return [];
+    catch (error) {
+      console.error("Произошла ошибка в получении данных из localstorage", error);
+      return [];
+    }
   });
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import Collection from "../components/Collection";
 
 function Home({ collections, setCollections }) {
@@ -8,6 +8,7 @@ function Home({ collections, setCollections }) {
   });
 
   const [searchValue, setSearchValue] = useState("");
+  const [error, setError] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -15,13 +16,16 @@ function Home({ collections, setCollections }) {
   }
 
   function handleChange(e) {
-    setCollectionForm({...collectionForm, [e.target.name]: e.target.value});
+    setCollectionForm(prev => ({...prev , [e.target.name]: e.target.value}));
   }
 
   function addCollection() {
     const hasEmptyField = Object.values(collectionForm).some(field => field.trim().length === 0);
-    if (hasEmptyField) return;
-   
+    if (hasEmptyField) {
+      setError("Введите все поля формы");
+      return;
+    }
+      
     const collection = {
       id: Date.now(),
       title: collectionForm.title.trim(),
@@ -29,7 +33,7 @@ function Home({ collections, setCollections }) {
       mods: []
     }
 
-    setCollections([...collections, collection]);
+    setCollections(prev => [...prev, collection]);
     setCollectionForm({
       title: "",
       description: ""
@@ -37,13 +41,14 @@ function Home({ collections, setCollections }) {
   }
 
   function removeCollection(id) {
-    setCollections(collections.filter(collection => id !== collection.id));
+    setCollections(prev => prev.filter(collection => id !== collection.id));
   }
 
   function saveCollection(newCollection) {
-    setCollections(collections.map(collection => (
+
+    setCollections(prev => prev.map(collection => (
       collection.id === newCollection.id 
-      ? {...collection, title: newCollection.title, description: newCollection.description}
+      ? {...collection, ...newCollection}
       : collection
     )))
   }
@@ -71,7 +76,8 @@ function Home({ collections, setCollections }) {
           name="description"
           value={collectionForm.description}
           onChange={handleChange}/>
-          <button onClick={addCollection}>Добавить коллекцию</button>
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Добавить коллекцию</button>
       </form>
 
       <ul className="collections-list">

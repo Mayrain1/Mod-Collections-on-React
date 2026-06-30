@@ -5,16 +5,27 @@ function Mod({ mod, removeMod, saveMod }) {
     const [editForm, setEditForm] = useState(null);
 
     function handleChange(e) {
-        setEditForm({...editForm, [e.target.name]: e.target.value })
+        setEditForm(prev => ({...prev, [e.target.name]: e.target.value }))
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        saveMod({...editForm, 
+                title: editForm.title.trim(),
+                description: editForm.description.trim(),
+                link: editForm.link.trim(),
+                image: editForm.image.trim()
+            });
+        setIsEditing(false);
     }
 
     return (
-        <div>
+        <>
             <li>
                 {isEditing 
                     ? (
                     <>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <label htmlFor="mod-input-title">Введите название мода: </label>
                         <input id="mod-input-title"
                         name="title"
@@ -38,11 +49,11 @@ function Mod({ mod, removeMod, saveMod }) {
                         name="image"
                         value={editForm.image}
                         onChange={handleChange}/>
+
+                        <button type="submit">Сохранить</button>
+                        <button type="button" 
+                        onClick={() => setIsEditing(false)}>Отмена</button>
                     </form>
-                    <button onClick={() => {
-                        saveMod(editForm);
-                        setIsEditing(false);
-                    }}>Сохранить</button>
                     </>
                     ) 
 
@@ -56,14 +67,13 @@ function Mod({ mod, removeMod, saveMod }) {
                     rel="noopener noreferrer"
                     >Ссылка на мод</a>
                     <button onClick={() => {
-                        setEditForm({
-                            ...mod});
+                        setEditForm({...mod});
                         setIsEditing(true)}}>Редактировать</button>
                     <button onClick={() => removeMod(mod.id)}>Удалить мод</button>
                     </>
                     )} 
             </li>
-        </div>
+        </>
     )
 }
 
